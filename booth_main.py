@@ -39,6 +39,13 @@ if not cam_default_settings:
 	if UseCustom.lower() == "n":
 		cam_default_settings = True
 
+# select theme	
+selectedTheme = "N"
+while Theme.lower()	!= "c" and Theme.lower() != "n":
+	Theme = input("Select theme to use. (n: normal or c: comic) ")
+if Theme.lower() == "c":
+	selectedTheme = "C"
+
 ''' setup GPIO pins '''
 GPIO.setmode(GPIO.BCM)
 atexit.register(GPIO.cleanup)
@@ -51,11 +58,18 @@ GPIO.setup(PuBuLED_GPIO_PIN, GPIO.OUT)
 pygame.init()
 pygame.mouse.set_visible(False)
 Screen = pygame.display.set_mode((xScreen,yScreen))
-# load frames
-Home_Screen = pygame.image.load(MAIN_SCREEN)
-Display_Screen = pygame.image.load(DISPLAY_SCREEN)
-Prepare_Screen = pygame.image.load(PREPARE_SCREEN)
-Print_Screen = pygame.image.load(PRINT_SCREEN)
+if selectedTheme == "N":
+	# load frames for normal theme
+	Home_Screen = pygame.image.load(MAIN_SCREEN)
+	Display_Screen = pygame.image.load(DISPLAY_SCREEN)
+	Prepare_Screen = pygame.image.load(PREPARE_SCREEN)
+	Print_Screen = pygame.image.load(PRINT_SCREEN)
+else:
+	# load frames for comics theme
+	Home_Screen = pygame.image.load(MAIN_SCREEN_COMIC)
+	Display_Screen = pygame.image.load(DISPLAY_SCREEN_COMIC)
+	Prepare_Screen = pygame.image.load(PREPARE_SCREEN_COMIC)
+# load oter frames
 Disp1 = pygame.image.load(COUNTDOWN_1)
 Disp2 = pygame.image.load(COUNTDOWN_2)
 Disp3 = pygame.image.load(COUNTDOWN_3)
@@ -140,7 +154,10 @@ while MainFlag:
 		Screen = pygame.display.set_mode((xScreen,yScreen))
 		Screen.blit(Prepare_Screen, (0,0))
 		pygame.display.update()
-		DispStrip = create_strips(new_folder)
+		if selectedTheme == "N":
+			DispStrip = create_strips(new_folder)
+		else:
+			DispStrip = create_comicStrips(new_folder)
 		status = DISPLAY
 
 	elif status == DISPLAY:

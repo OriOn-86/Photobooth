@@ -60,6 +60,44 @@ def create_strips(folder_name):
 	os.system("sudo chgrp pi " + folder_name + "DoubleStrip.jpg")
 	return Strip
 
+def create_comicStrips(folder_name):
+	''' Creates the 2 photo strips ...
+		landscape strip with header band. '''
+	global xComicStrip, yComicStrip
+	xMargin = 194
+	yMargin = 722
+	# check folder content
+	photos = os.listdir(folder_name)
+	if 'image1.jpeg' not in photos or 'image2.jpeg' not in photos or 'image3.jpeg' not in photos:
+		print ("Could not process folder {}".format(folder_name))
+		return
+	# create the single strip
+	Strip = pygame.Surface((xComicStrip, yComicStrip))
+	background = pygame.image.load(BG_STRIP_COMIC, 'jpg')
+	background = pygame.transform.scale(background, (xComicStrip, yComicStrip))
+	Strip.blit(background, (0,0))
+	i = 1
+	while i <= NB_PIC:
+		photo_name = folder_name + "image" + str(i) + ".jpeg"
+		photo = pygame.image.load(photo_name, 'jpg')
+		photo = pygame.transform.scale(photo, (photo.get_width() / 2, photo.get_height() / 2))
+		Strip.blit(photo, (xMargin, yMargin))
+		i += 1
+		xMargin += 2675
+	pygame.image.save(Strip, folder_name + "SingleStrip.jpg")
+	os.system("sudo chown pi " + folder_name + "SingleStrip.jpg")
+	os.system("sudo chgrp pi " + folder_name + "SingleStrip.jpg")
+	# publish
+	db_publish_on_website(folder_name)
+	# create the double strip
+	DoubleStrip = pygame.Surface((xComicStrip, 2 * yComicStrip))
+	DoubleStrip.blit(Strip, (0, 0))
+	DoubleStrip.blit(Strip, (0, yComicStrip))
+	pygame.image.save(DoubleStrip, folder_name + "DoubleStrip.jpg")
+	os.system("sudo chown pi " + folder_name + "DoubleStrip.jpg")
+	os.system("sudo chgrp pi " + folder_name + "DoubleStrip.jpg")
+	return Strip	
+	
 def generate_folder():
 	''' generate a folder named based on date and time YYYY-MM-DD hh:mm:ss ''' 
 	folder_name = LOCAL_DIRECTORY + OUTPUT_DIRECTORY + time.strftime("%Y%m%d_%H%M%S", time.localtime())
